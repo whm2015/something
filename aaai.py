@@ -7,6 +7,8 @@ import itertools
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+import matplotlib.transforms as transforms
 from scipy.stats import pearsonr
 
 
@@ -287,18 +289,15 @@ def main2():
     d = [b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17, b18, b19]
     # c = [a4, a5, a9, a12]
     # d = [b4, b5, b9, b12]
-    for i in c:
-        assert len(i) == 7
-    for i in d:
-        assert len(i) == 7
 
     for index, k in enumerate(zip(c, d)):
         i = k[0]
         j = k[1]
-        plt.xlim(0, 1)
+        plt.xlim(-4, 6)
         plt.ylim(-1, 11)
-        plt.scatter([x[1][2] for x in i], j)
-        plt.savefig('C:\\Users\\isaac\\Desktop\\2分类acc\\' + str(index) + '.png', format='png')
+        print([x[1][0] for x in i], j)
+        plt.scatter([x[1][0] for x in i], j)
+        plt.savefig('C:\\Users\\isaac\\Desktop\\2分类我们和glad固定坐标\\' + str(index) + '.png', format='png')
         plt.close()
 
 
@@ -486,5 +485,478 @@ def main10():
         plt.close()
 
 
+def main_new_2():
+    number_index = [
+        [8144, 4802, 500, 1343],
+        [4110, 7039, 8802, 7402],
+        [8169, 4802, 8802, 2744],
+        [6547, 8169, 7852, 7932],
+        [8169, 4802, 5145, 4968],
+        [7758, 7039, 1343, 7371],
+        [7039, 2931, 7165, 2744],
+        [2699, 1353, 8024, 7738],
+        [1353, 8576, 7852, 4752],
+        [4266, 8122, 5023, 4752],
+        [8186, 6839, 7402, 4752],
+        [8144, 7758, 8084, 7932],
+        [6769, 8141, 7852, 7402],
+        [2931, 3434, 5023, 7371],
+        [2699, 8163, 7738, 1248],
+        [4110, 7758, 7165, 7519],
+        [8097, 8127, 6466, 7165],
+        [5534, 1353, 7932, 1343],
+        [8141, 8097, 5145, 7374],
+        [4110, 2931, 7593, 1343],
+        [8576, 4802, 1343, 8802],
+        [4266, 8179, 1248, 7374],
+        [4266, 3434, 5967, 7371],
+        [1353, 2931, 7328, 4752],
+        [4480, 2931, 4752, 7593],
+        [8144, 3434, 7374, 8084],
+        [1335, 8144, 8084, 7371],
+        [8179, 8576, 8084, 7519],
+        [4802, 8576, 8134, 5023],
+        [8186, 3434, 5967, 7519],
+    ]
+    with open(r'C:\Users\isaac\Desktop\2class_diffi.pkl', 'rb') as f:
+        diff = pickle.load(f)
+    print(type(diff))
+    diff_dict = {}
+    for i in diff:
+        diff_dict[i[0]] = i[1]
+    for index, i in enumerate(range(20, 50)):
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\难度预测\results3', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff = np.load(this_file)
+        nan_index = [np.isnan(x).any() for x in predict_diff]
+        if True in nan_index:
+            nonan_index = nan_index.index(True) - 1
+        else:
+            nonan_index = -1
+        print(i, nonan_index)
+        print(predict_diff[nonan_index].reshape(4))
+
+        plt.xlim(-0.1, 1.1)
+        plt.ylim(-1, 11)
+        plt.scatter([diff_dict[x][2] for x in number_index[index]], predict_diff[nonan_index].reshape(4),)
+        plt.savefig('C:\\Users\\isaac\\Desktop\\2分类难度预测\\' + str(i) + 'glad.png', format='png', dpi=300)
+        plt.close()
+
+
+def main_new_10():
+    number_index = [
+        [443, 491, 655, 478],
+        [422, 431, 596, 22],
+        [627, 540, 483, 62],
+        [622, 551, 655, 24],
+        [34, 443, 61, 519],
+        [551, 34, 576, 519],
+        [680, 540, 604, 562],
+        [638, 40, 604, 7],
+        [505, 580, 639, 677],
+        [680, 523, 596, 655],
+        [540, 464, 61, 22],
+        [540, 627, 96, 519],
+        [540, 551, 483, 90],
+        [557, 551, 15, 96],
+        [107, 431, 673, 96],
+        [40, 621, 576, 62],
+        [557, 621, 440, 613],
+        [107, 580, 446, 96],
+        [505, 551, 673, 596],
+        [622, 680, 15, 519],
+        [523, 107, 604, 7],
+        [443, 557, 15, 61],
+        [602, 491, 478, 483],
+        [107, 422, 24, 483],
+        [554, 443, 562, 15],
+        [554, 491, 576, 613],
+        [431, 107, 22, 576],
+        [602, 34, 562, 596],
+        [551, 557, 576, 673],
+        [464, 680, 478, 613],
+    ]
+    with open(r'C:\Users\isaac\Desktop\10class_diffi.pkl', 'rb') as f:
+        diff = pickle.load(f)
+    print(type(diff))
+    diff_dict = {}
+    for i in diff:
+        diff_dict[i[0]] = i[1]
+    music_data = np.load(r'C:\Users\isaac\Desktop\music_data.npz')
+    train_data_name = music_data['train_data_name']
+    for index, i in enumerate(range(20, 50)):
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\难度预测\results4', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff = np.load(this_file)
+        nan_index = [np.isnan(x).any() for x in predict_diff]
+        if True in nan_index:
+            nonan_index = nan_index.index(True) - 1
+        else:
+            nonan_index = -1
+        print(i, nonan_index)
+        print(predict_diff[nonan_index].reshape(4))
+
+        plt.xlim(-0.1, 1.1)
+        plt.ylim(-1, 11)
+        plt.scatter([diff_dict[train_data_name[x]][2] for x in sorted(number_index[index], reverse=True)], predict_diff[nonan_index].reshape(4),)
+        plt.savefig('C:\\Users\\isaac\\Desktop\\10分类难度预测\\' + str(i) + 'glad.png', format='png', dpi=300)
+        plt.close()
+
+
+def main2_50():
+    number_index = [
+        [5658, 4714, 8141, 8232],
+        [4440, 3250, 3939, 2872],
+        [5658, 1526, 7627, 741],
+        [3255, 4231, 3339, 741],
+        [8159, 3455, 1970, 5465],
+        [6121, 3250, 7016, 1209],
+        [8579, 3455, 2872, 1552],
+        [4714, 9708, 8232, 10004],
+        [4776, 2237, 3774, 2509],
+        [3250, 4440, 1645, 7906],
+        [8159, 244, 7144, 10402],
+        [2037, 5458, 2499, 988],
+        [7013, 8579, 5467, 8113],
+        [4440, 285, 1257, 6700],
+        [9708, 1232, 3814, 3109],
+        [5458, 4440, 3814, 23],
+        [2704, 8579, 7627, 1792],
+        [1367, 6121, 733, 526],
+        [1526, 7021, 8113, 3109],
+        [3250, 5317, 8141, 4656],
+        [3455, 8469, 5465, 988],
+        [8350, 8469, 4530, 7144],
+        [244, 1232, 1257, 4656],
+        [8350, 2658, 741, 5693],
+        [3455, 2056, 3630, 3109],
+        [6500, 2458, 6292, 650],
+        [6500, 4440, 6012, 3774],
+        [4082, 5205, 8141, 7016],
+        [8350, 4776, 1552, 4112],
+        [8350, 5205, 3939, 4112],
+        [9925, 5539, 741, 1257],
+        [3455, 2704, 733, 10004],
+        [9708, 2704, 3075, 5465],
+        [244, 4231, 5467, 741],
+        [8579, 3455, 6473, 1792],
+        [5658, 8802, 568, 5465],
+        [3455, 8350, 1792, 8113],
+        [244, 3250, 3774, 6700],
+        [2037, 2698, 1970, 526],
+        [7021, 8159, 3814, 6012],
+        [5458, 6121, 2499, 23],
+        [285, 2153, 6292, 4550],
+        [6121, 5539, 1257, 1209],
+        [3042, 7013, 7144, 650],
+        [4082, 9295, 7627, 4550],
+        [9742, 3255, 6292, 8232],
+        [1554, 7021, 6413, 3306],
+        [2056, 2458, 1356, 650],
+        [1232, 1367, 3075, 568],
+        [7021, 2704, 526, 6413],
+    ]
+    with open(r'C:\Users\isaac\Desktop\2class_diffi.pkl', 'rb') as f:
+        diff = pickle.load(f)
+    print(type(diff))
+    diff_dict = {}
+    for i in diff:
+        diff_dict[i[0]] = i[1]
+    for index, i in enumerate(range(50, 100)):
+        if i not in [50, 65, 70, 85]:
+            continue
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\50组难度预测新参数\2\results5', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff = np.load(this_file)
+        nan_index = [np.isnan(x).any() for x in predict_diff]
+        if True in nan_index:
+            nonan_index = nan_index.index(True) - 1
+        else:
+            nonan_index = -1
+        print(i, nonan_index)
+        print(predict_diff[nonan_index].reshape(4))
+
+        plt.xlim(-10, 300)
+        plt.ylim(-1, 510)
+        plt.scatter([math.exp(diff_dict[x][0]) for x in number_index[index]], predict_diff[nonan_index].reshape(4),)
+    plt.savefig('C:\\Users\\isaac\\Desktop\\50组新参数难度图\\2\\' + str(i) + 'zong.png', format='png', dpi=300)
+    plt.close()
+
+
+def main10_50():
+    number_index = [
+        [595, 564, 306, 82],
+        [576, 106, 94, 11],
+        [479, 467, 463, 93],
+        [511, 110, 87, 11],
+        [679, 97, 92, 80],
+        [604, 104, 91, 22],
+        [308, 244, 79, 74],
+        [673, 604, 527, 130],
+        [677, 633, 79, 78],
+        [554, 530, 520, 157],
+        [640, 544, 157, 53],
+        [677, 673, 493, 51],
+        [673, 157, 98, 94],
+        [637, 595, 530, 104],
+        [585, 511, 308, 97],
+        [677, 82, 67, 65],
+        [539, 467, 434, 104],
+        [595, 546, 466, 97],
+        [530, 308, 110, 98],
+        [653, 612, 494, 63],
+        [633, 596, 491, 67],
+        [554, 472, 467, 90],
+        [554, 130, 103, 53],
+        [666, 653, 306, 130],
+        [493, 467, 105, 51],
+        [585, 532, 520, 357],
+        [544, 308, 93, 90],
+        [490, 147, 104, 93],
+        [673, 463, 105, 92],
+        [679, 673, 130, 82],
+        [637, 532, 490, 82],
+        [633, 631, 493, 104],
+        [663, 604, 493, 102],
+        [244, 78, 63, 51],
+        [244, 157, 97, 78],
+        [612, 212, 73, 68],
+        [673, 653, 612, 8],
+        [600, 564, 467, 80],
+        [637, 439, 98, 11],
+        [640, 383, 145, 91],
+        [103, 90, 11, 8],
+        [640, 434, 94, 78],
+        [673, 306, 78, 63],
+        [640, 595, 463, 67],
+        [545, 544, 483, 75],
+        [663, 479, 308, 157],
+        [631, 147, 97, 10],
+        [633, 545, 102, 74],
+        [434, 229, 97, 80],
+        [546, 391, 308, 68],
+    ]
+    with open(r'C:\Users\isaac\Desktop\10class_diffi.pkl', 'rb') as f:
+        diff = pickle.load(f)
+    print(type(diff))
+    diff_dict = {}
+    for i in diff:
+        diff_dict[i[0]] = i[1]
+    music_data = np.load(r'C:\Users\isaac\Desktop\music_data.npz')
+    train_data_name = music_data['train_data_name']
+    for index, i in enumerate(range(50, 100)):
+        if i not in [55, 65, 77, 82]:
+            continue
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\50组难度预测新参数\10\results6', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff = np.load(this_file)
+        nan_index = [np.isnan(x).any() for x in predict_diff]
+        if True in nan_index:
+            nonan_index = nan_index.index(True) - 1
+        else:
+            nonan_index = -1
+        print(i, nonan_index)
+        print(predict_diff[nonan_index].reshape(4))
+
+        plt.xlim(-10, 300)
+        plt.ylim(-1, 510)
+        plt.scatter([math.exp(diff_dict[train_data_name[x]][0]) for x in number_index[index]], predict_diff[nonan_index].reshape(4),)
+    plt.savefig('C:\\Users\\isaac\\Desktop\\50组新参数难度图\\10\\' + str(i) + 'zong.png', format='png', dpi=300)
+    plt.close()
+
+
+def all_50():
+    number_index_2 = [
+        [5658, 4714, 8141, 8232],
+        [4440, 3250, 3939, 2872],
+        [5658, 1526, 7627, 741],
+        [3255, 4231, 3339, 741],
+        [8159, 3455, 1970, 5465],
+        [6121, 3250, 7016, 1209],
+        [8579, 3455, 2872, 1552],
+        [4714, 9708, 8232, 10004],
+        [4776, 2237, 3774, 2509],
+        [3250, 4440, 1645, 7906],
+        [8159, 244, 7144, 10402],
+        [2037, 5458, 2499, 988],
+        [7013, 8579, 5467, 8113],
+        [4440, 285, 1257, 6700],
+        [9708, 1232, 3814, 3109],
+        [5458, 4440, 3814, 23],
+        [2704, 8579, 7627, 1792],
+        [1367, 6121, 733, 526],
+        [1526, 7021, 8113, 3109],
+        [3250, 5317, 8141, 4656],
+        [3455, 8469, 5465, 988],
+        [8350, 8469, 4530, 7144],
+        [244, 1232, 1257, 4656],
+        [8350, 2658, 741, 5693],
+        [3455, 2056, 3630, 3109],
+        [6500, 2458, 6292, 650],
+        [6500, 4440, 6012, 3774],
+        [4082, 5205, 8141, 7016],
+        [8350, 4776, 1552, 4112],
+        [8350, 5205, 3939, 4112],
+        [9925, 5539, 741, 1257],
+        [3455, 2704, 733, 10004],
+        [9708, 2704, 3075, 5465],
+        [244, 4231, 5467, 741],
+        [8579, 3455, 6473, 1792],
+        [5658, 8802, 568, 5465],
+        [3455, 8350, 1792, 8113],
+        [244, 3250, 3774, 6700],
+        [2037, 2698, 1970, 526],
+        [7021, 8159, 3814, 6012],
+        [5458, 6121, 2499, 23],
+        [285, 2153, 6292, 4550],
+        [6121, 5539, 1257, 1209],
+        [3042, 7013, 7144, 650],
+        [4082, 9295, 7627, 4550],
+        [9742, 3255, 6292, 8232],
+        [1554, 7021, 6413, 3306],
+        [2056, 2458, 1356, 650],
+        [1232, 1367, 3075, 568],
+        [7021, 2704, 526, 6413],
+    ]
+    with open(r'C:\Users\isaac\Desktop\2class_diffi.pkl', 'rb') as f:
+        diff_2 = pickle.load(f)
+    print(type(diff_2))
+    diff_dict_2 = {}
+    for i in diff_2:
+        diff_dict_2[i[0]] = i[1]
+    plt.figure(figsize=(10, 5))
+    ax_2 = plt.subplot(121)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.xlabel('Difficulty learned by GLAD', fontsize=16)
+    plt.ylabel(r'$\beta^{(i)^{\prime}}$ predicted by SpeeLFC-D', fontsize=16)
+    x_2 = []
+    y_2 = []
+    for index, i in enumerate(range(50, 100)):
+        if i not in [50, 65, 70, 85]:
+            continue
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\50组难度预测新参数\2\results5', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff_2 = np.load(this_file)
+        nan_index_2 = [np.isnan(x).any() for x in predict_diff_2]
+        if True in nan_index_2:
+            nonan_index_2 = nan_index_2.index(True) - 1
+        else:
+            nonan_index_2 = -1
+        print(i, nonan_index_2)
+        print(predict_diff_2[nonan_index_2].reshape(4))
+        x_2.extend([math.exp(diff_dict_2[x][0]) for x in number_index_2[index]])
+        y_2.extend(predict_diff_2[nonan_index_2].reshape(4))
+    for i in range(len(x_2)):
+        if x_2[i] > 100:
+            x_2[i] = 100
+    print(x_2)
+    plt.xlim(-10, 110)
+    plt.ylim(-1, 520)
+    plt.scatter(x_2, y_2)
+    ellipse2_1 = Ellipse((0, 126), width=14, height=220, facecolor='none', edgecolor='C0', linestyle='dashed')
+    ellipse2_2 = Ellipse((65, 322), width=81, height=220, facecolor='none', edgecolor='C0', linestyle='dashed')
+    ax_2.add_patch(ellipse2_1)
+    ax_2.add_patch(ellipse2_2)
+
+    number_index_10 = [
+        [595, 564, 306, 82],
+        [576, 106, 94, 11],
+        [479, 467, 463, 93],
+        [511, 110, 87, 11],
+        [679, 97, 92, 80],
+        [604, 104, 91, 22],
+        [308, 244, 79, 74],
+        [673, 604, 527, 130],
+        [677, 633, 79, 78],
+        [554, 530, 520, 157],
+        [640, 544, 157, 53],
+        [677, 673, 493, 51],
+        [673, 157, 98, 94],
+        [637, 595, 530, 104],
+        [585, 511, 308, 97],
+        [677, 82, 67, 65],
+        [539, 467, 434, 104],
+        [595, 546, 466, 97],
+        [530, 308, 110, 98],
+        [653, 612, 494, 63],
+        [633, 596, 491, 67],
+        [554, 472, 467, 90],
+        [554, 130, 103, 53],
+        [666, 653, 306, 130],
+        [493, 467, 105, 51],
+        [585, 532, 520, 357],
+        [544, 308, 93, 90],
+        [490, 147, 104, 93],
+        [673, 463, 105, 92],
+        [679, 673, 130, 82],
+        [637, 532, 490, 82],
+        [633, 631, 493, 104],
+        [663, 604, 493, 102],
+        [244, 78, 63, 51],
+        [244, 157, 97, 78],
+        [612, 212, 73, 68],
+        [673, 653, 612, 8],
+        [600, 564, 467, 80],
+        [637, 439, 98, 11],
+        [640, 383, 145, 91],
+        [103, 90, 11, 8],
+        [640, 434, 94, 78],
+        [673, 306, 78, 63],
+        [640, 595, 463, 67],
+        [545, 544, 483, 75],
+        [663, 479, 308, 157],
+        [631, 147, 97, 10],
+        [633, 545, 102, 74],
+        [434, 229, 97, 80],
+        [546, 391, 308, 68],
+    ]
+    with open(r'C:\Users\isaac\Desktop\10class_diffi.pkl', 'rb') as f:
+        diff_10 = pickle.load(f)
+    print(type(diff_10))
+    diff_dict_10 = {}
+    for i in diff_10:
+        diff_dict_10[i[0]] = i[1]
+    music_data = np.load(r'C:\Users\isaac\Desktop\music_data.npz')
+    train_data_name = music_data['train_data_name']
+    ax_10 = plt.subplot(122)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.xlabel('Difficulty learned by GLAD', fontsize=16)
+    plt.ylabel(r'$\beta^{(i)^{\prime}}$ predicted by SpeeLFC-D', fontsize=16)
+    x_10 = []
+    y_10 = []
+    for index, i in enumerate(range(50, 100)):
+        if i not in [55, 65, 77, 82]:
+            continue
+        this_file = os.path.join(r'C:\Users\isaac\Desktop\50组难度预测新参数\10\results6', str(i), 'predict_results.npy')
+        assert os.path.exists(this_file)
+        predict_diff_10 = np.load(this_file)
+        nan_index_10 = [np.isnan(x).any() for x in predict_diff_10]
+        if True in nan_index_10:
+            nonan_index_10 = nan_index_10.index(True) - 1
+        else:
+            nonan_index_10 = -1
+        print(i, nonan_index_10)
+        print(predict_diff_10[nonan_index_10].reshape(4))
+        x_10.extend([math.exp(diff_dict_10[train_data_name[x]][0]) for x in number_index_10[index]])
+        y_10.extend(predict_diff_10[nonan_index_10].reshape(4))
+    for i in range(len(x_10)):
+        if x_10[i] > 100:
+            x_10[i] = 100
+    plt.xlim(-10, 110)
+    plt.ylim(-1, 520)
+    plt.scatter(x_10, y_10)
+    ellipse10_1 = Ellipse((0, 178), width=14, height=268, facecolor='none', edgecolor='C0', linestyle='dashed')
+    ellipse10_2 = Ellipse((71, 367), width=91, height=292, facecolor='none', edgecolor='C0', linestyle='dashed')
+    ax_10.add_patch(ellipse10_1)
+    ax_10.add_patch(ellipse10_2)
+    plt.figtext(0.26, 0.05, '(a) Dataset: SPC', va="center", ha="center", size=18)
+    plt.figtext(0.76, 0.05, '(b) Dataset: MGC', va="center", ha="center", size=18)
+    plt.subplots_adjust(top=0.94, bottom=0.24, left=0.1, right=0.96, wspace=0.4)
+    plt.savefig('C:\\Users\\isaac\\Desktop\\' + str(i) + 'zong.pdf', format='pdf', dpi=300)
+    plt.close()
+
+
 if __name__ == '__main__':
-    main2()
+    all_50()
